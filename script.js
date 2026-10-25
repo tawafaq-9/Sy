@@ -1,7 +1,8 @@
 /* ==========================================================
-   تَوافق - ملف البرمجة والمنطق الأساسي (script.js - النسخة النهائية المحدثة)
+   تَوافق - ملف البرمجة والمنطق الأساسي (script.js - النسخة الكاملة الشاملة)
    ========================================================== */
 
+// --- 1. بنك الأسئلة الاحترافي مع مفاتيح الأيقونات ---
 var defaultQuestionsBank = [
     {
         id: 1,
@@ -125,13 +126,14 @@ var defaultQuestionsBank = [
     }
 ];
 
+// --- 2. حالة التطبيق (State) ---
 var quizState = {
     creatorName: "",
-    gender: "male",
-    age: 28,
+    gender: "female",
+    age: 20,
     relation: "friend",
     count: 10,
-    theme: "youth",
+    theme: "cute",
     isPrivate: false,
     questions: [],
     creatorAnswers: {}, 
@@ -140,21 +142,18 @@ var quizState = {
     currentPlayIndex: 0
 };
 
+// --- 3. تهيئة عناصر الصفحة ---
 document.addEventListener("DOMContentLoaded", () => {
     initUIEvents();
     checkURLParameters();
 });
 
+// --- 4. إدارة الفعاليات والأزرار ---
 function initUIEvents() {
-    // التقاط الكروت (الجنس، العلاقة، عدد الأسئلة) بشكل مرن يدعم الـ HTML الحالي
-    document.querySelectorAll('.select-card, .option-card').forEach(card => {
+    document.querySelectorAll('.option-card').forEach(card => {
         card.addEventListener('click', function() {
-            const group = this.getAttribute('data-group') || checkCardGroup(this);
-            if (!group) return;
-
-            document.querySelectorAll(`[data-group="${group}"], .select-card`).forEach(c => {
-                if(c.getAttribute('data-group') === group) c.classList.remove('active');
-            });
+            const group = this.getAttribute('data-group');
+            document.querySelectorAll(`.option-card[data-group="${group}"]`).forEach(c => c.classList.remove('active'));
             this.classList.add('active');
 
             const val = this.getAttribute('data-value');
@@ -165,6 +164,19 @@ function initUIEvents() {
             autoUpdateTheme();
         });
     });
+
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            if (document.body.classList.contains('theme-cute')) {
+                document.body.classList.remove('theme-cute');
+                document.body.classList.add('theme-youth');
+            } else {
+                document.body.classList.remove('theme-youth');
+                document.body.classList.add('theme-cute');
+            }
+        });
+    }
 
     const toQuestionsBtn = document.getElementById('to-questions-btn');
     if (toQuestionsBtn) {
@@ -190,19 +202,27 @@ function initUIEvents() {
     if (nextPlayBtn) {
         nextPlayBtn.addEventListener('click', handleNextPlayQuestion);
     }
-}
 
-function checkCardGroup(element) {
-    // تحديد المجموعة في حال لم يتم وضع data-group بالـ HTML مباشرة
-    const text = element.innerText;
-    if (text.includes("ذكر") || text.includes("أنثى")) return "gender";
-    if (text.includes("أخ") || text.includes("صديق") || text.includes("حبيب") || text.includes("زوج")) return "relation";
-    if (text.includes("10") || text.includes("15") || text.includes("20")) return "count";
-    return null;
+    const retestBtn = document.getElementById('re-test-btn');
+    if (retestBtn) {
+        retestBtn.addEventListener('click', () => window.location.reload());
+    }
+
+    const makeBtn = document.getElementById('make-my-own-quiz-btn');
+    if (makeBtn) {
+        makeBtn.addEventListener('click', () => {
+            window.location.href = window.location.origin + window.location.pathname;
+        });
+    }
 }
 
 function autoUpdateTheme() {
-    quizState.theme = (quizState.gender === 'female') ? 'cute' : 'youth';
+    const themeSelect = document.getElementById('theme-select');
+    if (themeSelect && themeSelect.value !== 'auto') {
+        quizState.theme = themeSelect.value;
+    } else {
+        quizState.theme = (quizState.gender === 'female') ? 'cute' : 'youth';
+    }
     document.body.className = `theme-${quizState.theme}`;
 }
 
@@ -212,6 +232,7 @@ function showScreen(screenId) {
     if (target) target.classList.add('active');
 }
 
+// ربط كل مفتاح بأيقونة FontAwesome احترافية ومضمونة 100%
 function getProIconClass(key) {
     const iconsMap = {
         "movie": "fa-film", "gamepad": "fa-gamepad", "moon": "fa-moon", "pizza": "fa-pizza-slice",
@@ -223,11 +244,22 @@ function getProIconClass(key) {
         "lie": "fa-face-rolling-eyes", "money": "fa-wallet", "crown": "fa-crown", "annoyed": "fa-face-angry",
         "plan": "fa-clipboard-list", "dice": "fa-dice", "weather": "fa-cloud-sun", "relax": "fa-couch",
         "box": "fa-box-open", "heart": "fa-heart", "watch": "fa-clock", "burger": "fa-burger",
-        "flash": "fa-bolt", "search": "fa-magnifying-glass", "stress": "fa-triangle-exclamation", "smile": "fa-face-smile-beam"
+        "flash": "fa-bolt", "search": "fa-magnifying-glass", "stress": "fa-triangle-exclamation", "smile": "fa-face-smile-beam",
+        "sofa": "fa-couch", "car": "fa-car", "phone": "fa-mobile-screen", "controller": "fa-gamepad",
+        "mind": "fa-lightbulb", "emotion": "fa-heart", "group": "fa-users", "luck": "fa-clover",
+        "rain": "fa-cloud-rain", "beach": "fa-umbrella-beach", "spring": "fa-spa", "autumn": "fa-wind",
+        "strength": "fa-dumbbell", "break": "fa-mug-hot", "calendar": "fa-calendar-days",
+        "forest": "fa-tree", "city": "fa-city", "ocean": "fa-water", "bed": "fa-bed",
+        "meat": "fa-drumstick-bite", "soup": "fa-bowl-food", "fastfood": "fa-burger", "pie": "fa-pie",
+        "forgive": "fa-hands-clapping", "quiet": "fa-face-zipper", "timer": "fa-stopwatch", "talk": "fa-comments",
+        "clean": "fa-broom", "trip": "fa-suitcase-rolling", "book": "fa-book-open",
+        "letter": "fa-envelope", "service": "fa-hands-holding-child", "time": "fa-hourglass-half", "present": "fa-gift",
+        "sun": "fa-sun", "dizzy": "fa-face-dizzy", "energy": "fa-bolt-lightning"
     };
     return iconsMap[key] || "fa-star";
 }
 
+// --- 5. خطوة تخصيص الأسئلة واختيار العدد ---
 function goToQuestionsBuilder() {
     const nameInput = document.getElementById('creator-name');
     if (nameInput && !nameInput.value.trim()) {
@@ -236,9 +268,10 @@ function goToQuestionsBuilder() {
     }
 
     quizState.creatorName = nameInput.value.trim();
-    quizState.age = parseInt(document.getElementById('creator-age').value) || 28;
+    quizState.age = parseInt(document.getElementById('creator-age').value) || 20;
+    quizState.isPrivate = document.getElementById('privacy-toggle').checked;
 
-    let selectedCount = quizState.count || 10;
+    let selectedCount = quizState.count;
     let shuffled = [...defaultQuestionsBank].sort(() => 0.5 - Math.random());
     quizState.questions = JSON.parse(JSON.stringify(shuffled.slice(0, selectedCount)));
 
@@ -248,8 +281,32 @@ function goToQuestionsBuilder() {
 
 function renderQuestionsForCreator() {
     const container = document.getElementById('questions-list-container');
-    if(!container) return;
     container.innerHTML = '';
+
+    const addQBox = document.createElement('div');
+    addQBox.className = 'input-card';
+    addQBox.style.background = 'rgba(108, 92, 231, 0.05)';
+    addQBox.innerHTML = `
+        <label class="input-label"><i class="fa-solid fa-plus-circle"></i> أضف سؤالاً جديداً من عندك</label>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <input type="text" id="new-custom-question-text" class="text-input" placeholder="اكتب نص السؤال هنا...">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+            <input type="text" id="new-q-opt-0" class="text-input" placeholder="الخيار الأول">
+            <input type="text" id="new-q-opt-1" class="text-input" placeholder="الخيار الثاني">
+            <input type="text" id="new-q-opt-2" class="text-input" placeholder="الخيار الثالث">
+            <input type="text" id="new-q-opt-3" class="text-input" placeholder="الخيار الرابع">
+        </div>
+        <button type="button" id="submit-new-question-btn" class="main-action-btn" style="padding: 10px; font-size: 0.9rem;">إضافة السؤال إلى الاختبار</button>
+    `;
+    container.appendChild(addQBox);
+
+    setTimeout(() => {
+        const subNewBtn = document.getElementById('submit-new-question-btn');
+        if (subNewBtn) {
+            subNewBtn.onclick = addNewCustomQuestionToQuiz;
+        }
+    }, 100);
 
     quizState.questions.forEach((q, index) => {
         const card = document.createElement('div');
@@ -257,13 +314,21 @@ function renderQuestionsForCreator() {
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <label class="input-label" style="margin-bottom: 0;">${index + 1}. ${q.question}</label>
+                <button type="button" class="icon-btn delete-q-btn" data-qid="${q.id}" title="حذف السؤال" style="width: 30px; height: 30px; font-size: 0.8rem; background: #ff4757; color: white;"><i class="fa-solid fa-trash"></i></button>
             </div>
             <div class="cards-grid relation-grid" id="q-options-${q.id}">
                 ${q.options.map((opt, optIdx) => `
-                    <div class="select-card creator-opt ${quizState.creatorAnswers[q.id] === optIdx ? 'active' : ''}" data-qid="${q.id}" data-opt="${optIdx}" style="cursor:pointer; padding:12px; border:1px solid #ddd; border-radius:10px; margin-bottom:5px; text-align:center;">
+                    <div class="select-card creator-opt ${quizState.creatorAnswers[q.id] === optIdx ? 'active' : ''}" data-qid="${q.id}" data-opt="${optIdx}">
+                        <div class="icon-3d-wrapper" style="width: 50px; height: 50px; margin: 0 auto 8px auto; background: rgba(108, 92, 231, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                            <i class="fa-solid ${getProIconClass(q.iconKeys ? q.iconKeys[optIdx] : '')}" style="font-size: 1.3rem; color: var(--primary-color);"></i>
+                        </div>
                         <div class="card-title">${opt}</div>
                     </div>
                 `).join('')}
+            </div>
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+                <input type="text" class="text-input custom-option-input" id="custom-input-${q.id}" placeholder="أو أضف إجابة أخرى...">
+                <button type="button" class="sub-btn add-custom-opt-btn" data-qid="${q.id}" style="white-space: nowrap; padding: 0 15px;">إضافة الخيار</button>
             </div>
         `;
         container.appendChild(card);
@@ -280,11 +345,78 @@ function renderQuestionsForCreator() {
             quizState.creatorAnswers[qid] = optIdx;
         });
     });
+
+    document.querySelectorAll('.add-custom-opt-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const qid = parseInt(this.getAttribute('data-qid'));
+            const inputField = document.getElementById(`custom-input-${qid}`);
+            const customText = inputField.value.trim();
+
+            if (!customText) {
+                alert("الرجاء كتابة نص الإجابة الأخرى أولاً!");
+                return;
+            }
+
+            const targetQuestion = quizState.questions.find(item => item.id === qid);
+            if (targetQuestion) {
+                targetQuestion.options.push(customText);
+                if(!targetQuestion.iconKeys) targetQuestion.iconKeys = [];
+                targetQuestion.iconKeys.push("star");
+                const newOptIndex = targetQuestion.options.length - 1;
+                quizState.creatorAnswers[qid] = newOptIndex;
+                renderQuestionsForCreator();
+            }
+        });
+    });
+
+    document.querySelectorAll('.delete-q-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const qid = parseInt(this.getAttribute('data-qid'));
+            quizState.questions = quizState.questions.filter(item => item.id !== qid);
+            delete quizState.creatorAnswers[qid];
+            renderQuestionsForCreator();
+        });
+    });
 }
 
+function addNewCustomQuestionToQuiz() {
+    const qText = document.getElementById('new-custom-question-text').value.trim();
+    const opt0 = document.getElementById('new-q-opt-0').value.trim();
+    const opt1 = document.getElementById('new-q-opt-1').value.trim();
+    const opt2 = document.getElementById('new-q-opt-2').value.trim();
+    const opt3 = document.getElementById('new-q-opt-3').value.trim();
+
+    if (!qText) {
+        alert("الرجاء كتابة نص السؤال الجديد!");
+        return;
+    }
+
+    let userOpts = [opt0, opt1, opt2, opt3].filter(o => o !== "");
+    if (userOpts.length < 2) {
+        alert("الرجاء إدخال خيارين على الأقل للسؤال الجديد!");
+        return;
+    }
+
+    const newQuestionObj = {
+        id: Date.now(),
+        question: qText,
+        options: userOpts,
+        iconKeys: ["gift", "star", "fire", "trophy"]
+    };
+
+    quizState.questions.push(newQuestionObj);
+    quizState.creatorAnswers[newQuestionObj.id] = 0;
+    renderQuestionsForCreator();
+}
+
+// --- 6. توليد رابط المشاركة ---
 function generateQuizDashboard() {
     if (quizState.questions.length === 0) {
-        alert("يجب أن يحتوي الاختبار على أسئلة!");
+        alert("يجب أن يحتوي الاختبار على سؤال واحد على الأقل!");
+        return;
+    }
+    if (Object.keys(quizState.creatorAnswers).length < quizState.questions.length) {
+        alert("يرجى تحديد الإجابة الصحيحة لكل الأسئلة قبل المتابعة!");
         return;
     }
 
@@ -296,21 +428,26 @@ function generateQuizDashboard() {
     })));
 
     const shareUrl = `${window.location.origin}${window.location.pathname}?quiz=${payload}`;
-    const linkInput = document.getElementById('shareable-link-input');
-    if(linkInput) linkInput.value = shareUrl;
+    document.getElementById('shareable-link-input').value = shareUrl;
+
+    document.getElementById('share-whatsapp-btn').onclick = () => {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('اختبر مدى توافقك ومعرفتك بي عبر لعبة "تَوافق": ' + shareUrl)}`);
+    };
+    document.getElementById('share-telegram-btn').onclick = () => {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent('اختبار التوافق العجيب!')}`);
+    };
 
     showScreen('screen-dashboard');
 }
 
 function copyShareLink() {
     const input = document.getElementById('shareable-link-input');
-    if(input) {
-        input.select();
-        document.execCommand('copy');
-        alert("تم نسخ رابط الاختبار بنجاح!");
-    }
+    input.select();
+    document.execCommand('copy');
+    alert("تم نسخ رابط الاختبار بنجاح!");
 }
 
+// --- 7. فحص الرابط ومعالجة المشارك ---
 function checkURLParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     const quizDataParam = urlParams.get('quiz');
@@ -336,6 +473,7 @@ function checkURLParameters() {
     }
 }
 
+// --- 8. لعب الاختبار وبدء التحدي للمُختَبَر ---
 function startQuizPlay() {
     const takerInput = document.getElementById('taker-name-input');
     if (takerInput && !takerInput.value.trim()) {
@@ -359,6 +497,12 @@ function renderPlayQuestion() {
     const currEl = document.getElementById('current-q-num');
     if(currEl) currEl.innerText = quizState.currentPlayIndex + 1;
 
+    const fillBar = document.getElementById('progress-bar-fill');
+    if(fillBar) {
+        const percent = ((quizState.currentPlayIndex + 1) / quizState.questions.length) * 100;
+        fillBar.style.width = `${percent}%`;
+    }
+
     const container = document.getElementById('quiz-play-container');
     if(!container) return;
 
@@ -367,7 +511,10 @@ function renderPlayQuestion() {
             <h3 class="main-title" style="margin-bottom: 15px;">${q.question}</h3>
             <div class="cards-grid relation-grid">
                 ${q.options.map((opt, idx) => `
-                    <div class="select-card taker-opt" data-opt="${idx}" style="cursor:pointer; padding:12px; border:1px solid #ddd; border-radius:10px; margin-bottom:8px;">
+                    <div class="select-card taker-opt" data-opt="${idx}">
+                        <div class="icon-3d-wrapper" style="width: 50px; height: 50px; margin: 0 auto 8px auto; background: rgba(108, 92, 231, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid ${getProIconClass(q.iconKeys ? q.iconKeys[idx] : '')}" style="font-size: 1.3rem; color: var(--primary-color);"></i>
+                        </div>
                         <div class="card-title">${opt}</div>
                     </div>
                 `).join('')}
@@ -410,6 +557,20 @@ function calculateAndShowResult() {
     const percentage = Math.round((correctCount / quizState.questions.length) * 100);
     const scoreEl = document.getElementById('final-score-percent');
     if(scoreEl) scoreEl.innerText = percentage;
+
+    const badgeEl = document.getElementById('result-visual-badge');
+    const msgEl = document.getElementById('result-message-text');
+
+    if (percentage >= 80) {
+        if(badgeEl) badgeEl.innerText = "🏆";
+        if(msgEl) msgEl.innerText = `ما شاء الله! توافق أسطوري وعلاقة قوية جداً مع ${quizState.creatorName}!`;
+    } else if (percentage >= 50) {
+        if(badgeEl) badgeEl.innerText = "🤝";
+        if(msgEl) msgEl.innerText = `نتيجة حلوة ومقبولة! بتعرفوا بعض منيح بس بدها شوية مشاوير بعد مع ${quizState.creatorName}.`;
+    } else {
+        if(badgeEl) badgeEl.innerText = "😅";
+        if(msgEl) msgEl.innerText = `شكلكم بدكم قعدة قهوة طويلة لترجعوا تتعرفوا على بعض أكتر!`;
+    }
 
     showScreen('screen-result');
 }
